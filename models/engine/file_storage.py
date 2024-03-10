@@ -1,15 +1,15 @@
 #!/usr/bin/python3
-"""Module for the FileStorage class for AirBnB_clone"""
+"""The module  to manage file storage for Airbnb clone"""
 import json
 
 
 class FileStorage:
-    """This class Represent an abstracted storage engine"""
+    """Represent an abstracted storage engine."""
     __file_path = 'file.json'
     __objects = {}
 
     def all(self):
-        """Return the dictionary __objects"""
+        """Return the dictionary __objects in storage"""
         return FileStorage.__objects
 
     def new(self, obj):
@@ -17,7 +17,7 @@ class FileStorage:
         self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
 
     def save(self):
-        """serializes __objects to the JSON file"""
+        """Saves storage dictionary to file"""
         with open(FileStorage.__file_path, 'w') as jfile:
             dict_obj = {}
             dict_obj.update(FileStorage.__objects)
@@ -35,7 +35,7 @@ class FileStorage:
         from models.amenity import Amenity
         from models.review import Review
 
-        my_classes = {
+        classes = {
                     'BaseModel': BaseModel, 'User': User, 'Place': Place,
                     'State': State, 'City': City, 'Amenity': Amenity,
                     'Review': Review
@@ -45,6 +45,6 @@ class FileStorage:
             with open(FileStorage.__file_path, 'r') as jfile:
                 dict_obj = json.load(jfile)
                 for k, v in dict_obj.items():
-                        self.all()[k] = my_classes[v['__class__']](**v)
+                        self.all()[k] = classes[v['__class__']](**v)
         except FileNotFoundError:
             pass

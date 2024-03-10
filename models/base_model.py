@@ -1,14 +1,20 @@
 #!/usr/bin/python3
-"""Module for the Base Class for all models in Airbnb clone"""
+"""This module is a base class for all models"""
 import uuid
 from datetime import datetime
 
 
 class BaseModel:
-    """The base class for all models"""
+    """A base class for all Airbnb models"""
     def __init__(self, *args, **kwargs):
         """The class instance initilization"""
-        if kwargs:
+        if not kwargs:
+            from models import storage
+            self.id = str(uuid.uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
+            storage.new(self)
+        else:
             kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
                                                      '%Y-%m-%dT%H:%M:%S.%f')
             kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
@@ -16,18 +22,6 @@ class BaseModel:
             del kwargs['__class__']
             self.__dict__.update(kwargs)
 
-        else:
-            from models import storage
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-            storage.new(self)
-
-
-    def __str__(self):
-        """Return string reprsentation of instance"""
-        cls_n = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls_n, self.id, self.__dict__)
 
     def save(self):
         """Updates updated_at with the current datetime"""
@@ -36,7 +30,7 @@ class BaseModel:
         storage.save()
 
     def to_dict(self):
-        """Returns a dictionary with all keys/values of the instance"""
+        """Returns a dictionary with all keys/values of instance"""
         my_dict = {}
         my_dict.update(self.__dict__)
         my_dict.update({'__class__':
@@ -44,3 +38,8 @@ class BaseModel:
         my_dict['created_at'] = self.created_at.isoformat()
         my_dict['updated_at'] = self.updated_at.isoformat()
         return my_dict
+
+    def __str__(self):
+        """Returns a string representation of the instance"""
+        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
+        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
